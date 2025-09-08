@@ -200,16 +200,12 @@ const RootLayoutNav = React.memo(function RootLayoutNav() {
       countlyConfig.enableParameterTamperingProtection(SALT);
 
       if (consent.given) {
-        if (consent.advanced) {
+        if (consent.advanced || consent.optional) {
           countlyConfig.giveConsent(["sessions", "crashes", "users", "location", "attribution", "push", "star-rating", "feedback"]);
         }
 
-        if (consent.optional) {
-          countlyConfig.giveConsent(["sessions", "crashes", "users"]);
-        }
-
         if (consent.required) {
-          countlyConfig.giveConsent(["sessions"]);
+          countlyConfig.giveConsent(["sessions", "crashes"]);
         }
 
         if (consent.required || consent.optional || consent.advanced) {
