@@ -10,7 +10,6 @@ import Reanimated, {
   FadeIn,
   FadeOut,
   LinearTransition,
-  useAnimatedScrollHandler,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
@@ -355,9 +354,6 @@ const TasksView: React.FC = () => {
     ];
   }, [homeworksFromCache, showUndoneOnly, searchTerm, sortMethod, collapsedGroups]);
 
-  const scrollHandler = useAnimatedScrollHandler((event) => {
-    offsetY.value = event.contentOffset.y;
-  });
 
   const renderItem = useCallback(
     ({ item, index }: { item: Homework, index: number }) => {
@@ -502,7 +498,6 @@ const TasksView: React.FC = () => {
           paddingBottom: 100,
           paddingTop: headerHeight + 16
         }}
-        onScroll={scrollHandler}
         scrollEventThrottle={16}
         keyExtractor={keyExtractor}
         renderItem={renderItem}
