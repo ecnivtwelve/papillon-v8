@@ -500,9 +500,8 @@ const TasksView: React.FC = () => {
         contentContainerStyle={{
           paddingHorizontal: 16,
           paddingBottom: 100,
-          paddingTop: headerHeight + 16
+          paddingTop: headerHeight + 10
         }}
-        scrollEventThrottle={16}
         keyExtractor={keyExtractor}
         renderItem={renderItem}
         renderSectionHeader={renderSectionHeader}
