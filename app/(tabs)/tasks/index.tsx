@@ -39,7 +39,7 @@ import { getSubjectName } from "@/utils/subjects/name";
 
 type SortMethod = 'date' | 'subject' | 'done';
 
-const AnimatedSectionList = createAnimatedComponent(SectionList);
+const AnimatedSectionList = createAnimatedComponent(SectionList<Homework, HomeworkSection>);
 
 interface GroupHeader {
   type: 'header';
@@ -63,7 +63,7 @@ interface HomeworkSection {
 }
 
 const useMagicPrediction = (content: string) => {
-  const [magic, setMagic] = useState<any>(undefined);
+  const [magic, setMagic] = useState<undefined>(undefined);
   const magicEnabled = useSettingsStore(state => state.personalization.magicEnabled);
 
   useEffect(() => {
@@ -71,7 +71,7 @@ const useMagicPrediction = (content: string) => {
     if (content && magicEnabled) {
       predictHomework(content, magicEnabled)
         .then(p => !isCancelled && setMagic(p))
-        .catch(e => !isCancelled && console.error(e));
+        .catch(e => !isCancelled && error(e));
     } else {
       setMagic(undefined);
     }
@@ -154,8 +154,6 @@ const TaskItem = memo(
           description={item.content}
           date={new Date(item.dueDate)}
           progress={item.isDone ? 1 : 0}
-          index={index}
-          magic={magic}
           fromCache={fromCache ?? false}
           attachments={item.attachments}
           onProgressChange={(newProgress: number) => onProgressChange(item, newProgress)}
@@ -293,12 +291,10 @@ const TasksView: React.FC = () => {
   const sections = useMemo<HomeworkSection[]>(() => {
     let data = [...homeworksFromCache];
 
-    // filtre "undone only"
     if (showUndoneOnly) {
       data = data.filter(h => !h.isDone);
     }
 
-    // search optimisée (sans accents, case-insensitive)
     if (searchTerm.trim().length > 0) {
       const term = normalize(searchTerm);
       data = data.filter(h => {
@@ -311,7 +307,6 @@ const TasksView: React.FC = () => {
       });
     }
 
-    // tri
     if (sortMethod === 'date') {
       data.sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime());
     } else if (sortMethod === 'subject') {
@@ -320,7 +315,6 @@ const TasksView: React.FC = () => {
       data.sort((a, b) => Number(a.isDone) - Number(b.isDone));
     }
 
-    // groupement par date => parfait pour SectionList
     if (sortMethod === 'date') {
       const sectionMap = new Map<string, HomeworkSection>();
 
@@ -338,7 +332,6 @@ const TasksView: React.FC = () => {
           });
         }
 
-        // si la section est "collapsée", on ne pousse pas les items
         if (!collapsedGroups.includes(headerId)) {
           sectionMap.get(dateKey)!.data.push(hw);
         }
@@ -347,7 +340,6 @@ const TasksView: React.FC = () => {
       return Array.from(sectionMap.values());
     }
 
-    // pour les autres modes de tri, une seule section
     return [
       {
         id: 'all',
