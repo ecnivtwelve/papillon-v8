@@ -22,6 +22,7 @@ import { useAccountStore } from "@/stores/account";
 import { useSettingsStore } from "@/stores/settings";
 import { useAlert } from "@/ui/components/AlertProvider";
 import ChipButton from '@/ui/components/ChipButton';
+import { CircularProgress } from '@/ui/components/CircularProgress';
 import { Dynamic } from '@/ui/components/Dynamic';
 import Search from '@/ui/components/Search';
 import Stack from '@/ui/components/Stack';
@@ -108,7 +109,7 @@ const DateHeader = memo(
 
     return (
       <Dynamic animated key={`header:${title}`} entering={PapillonAppearIn} exiting={PapillonAppearOut}>
-        <Pressable onPress={onToggle} style={{ marginBottom: 12, marginTop: 8 }}>
+        <Pressable onPress={onToggle} style={{ marginBottom: 12 }}>
           <Stack
             direction='horizontal'
             gap={8}
@@ -337,9 +338,8 @@ const TasksView: React.FC = () => {
           });
         }
 
-        if (!collapsedGroups.includes(headerId)) {
-          sectionMap.get(dateKey)!.data.push(hw);
-        }
+        // Ajoute tous les devoirs, même si le groupe est rétracté
+        sectionMap.get(dateKey)!.data.push(hw);
       });
 
       return Array.from(sectionMap.values());
@@ -356,7 +356,11 @@ const TasksView: React.FC = () => {
 
 
   const renderItem = useCallback(
-    ({ item, index }: { item: Homework, index: number }) => {
+    ({ item, index, section }: { item: Homework, index: number, section: HomeworkSection }) => {
+      // Si le groupe est rétracté, ne pas afficher l'item
+      if (sortMethod === 'date' && collapsedGroups.includes(section.id)) {
+        return null;
+      }
       const inFresh = item.id ? homework[item.id] : undefined;
       const source = inFresh ?? item;
       const fromCache = !inFresh;
@@ -372,7 +376,7 @@ const TasksView: React.FC = () => {
         </Reanimated.View>
       );
     },
-    [homework, onProgressChange]
+    [homework, onProgressChange, collapsedGroups, sortMethod]
   );
 
   const renderSectionHeader = useCallback(
@@ -504,6 +508,27 @@ const TasksView: React.FC = () => {
         renderSectionHeader={renderSectionHeader}
         ListEmptyComponent={<EmptyState isSearching={searchTerm.length > 0} />}
         stickySectionHeadersEnabled={false}
+        ListHeaderComponent={
+          <Stack padding={16} backgroundColor={"#D62B9415"} bordered radius={20} gap={8} hAlign="center" direction='horizontal' style={{ marginBottom: 15 }}>
+            <CircularProgress
+              backgroundColor={colors.text + "22"}
+              percentageComplete={
+                sections.reduce((acc, section) => acc + section.data.filter(hw => hw.isDone).length, 0) /
+                Math.max(1, sections.reduce((acc, section) => acc + section.data.length, 0)) * 100
+              }
+              radius={15}
+              strokeWidth={5}
+              fill={"#D62B94"}
+            />
+            <Typography variant="title" color='#D62B94'>
+              {(() => {
+                const total = sections.reduce((acc, section) => acc + section.data.length, 0);
+                const undone = sections.reduce((acc, section) => acc + section.data.filter(hw => !hw.isDone).length, 0);
+                return `${undone} tâche${undone !== 1 ? 's' : ''} restante${undone !== 1 ? 's' : ''} cette semaine`;
+              })()}
+            </Typography>
+          </Stack>
+        }
         refreshControl={
           <RefreshControl
             refreshing={isRefreshing}
