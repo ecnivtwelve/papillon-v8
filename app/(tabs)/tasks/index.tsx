@@ -6,13 +6,14 @@ import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { Platform, Pressable, RefreshControl, SectionList, StyleSheet, View } from 'react-native';
 import Reanimated, {
   createAnimatedComponent,
+  Easing,
   FadeIn,
   FadeOut,
   LinearTransition,
   useAnimatedScrollHandler,
   useAnimatedStyle,
   useSharedValue,
-  withTiming
+  withTiming,
 } from 'react-native-reanimated';
 
 import { getWeekNumberFromDate, updateHomeworkIsDone, useHomeworkForWeek } from "@/database/useHomework";
@@ -97,9 +98,11 @@ const DateHeader = memo(
   ({ title, isCollapsed, onToggle }: { title: string, isCollapsed: boolean, onToggle: () => void }) => {
     const { colors } = useTheme();
 
+    const papillonEasing = Easing.bezier(0.3, 0.3, 0, 1);
+
     const animatedStyle = useAnimatedStyle(() => {
       return {
-        transform: [{ rotate: withTiming(isCollapsed ? '-180deg' : '0deg', { duration: 350 }) }],
+        transform: [{ rotate: withTiming(isCollapsed ? '-180deg' : '0deg', { duration: 350, easing: papillonEasing }) }],
         marginLeft: 'auto'
       };
     });
@@ -145,7 +148,10 @@ const TaskItem = memo(
     const magic = useMagicPrediction(cleanContent);
 
     return (
-      <View style={styles.taskContainer}>
+      <Reanimated.View style={styles.taskContainer}
+        entering={PapillonAppearIn}
+        exiting={PapillonAppearOut}
+      >
         <Task
           subject={getSubjectName(item.subject)}
           emoji={getSubjectEmoji(item.subject)}
@@ -158,7 +164,7 @@ const TaskItem = memo(
           attachments={item.attachments}
           onProgressChange={(newProgress: number) => onProgressChange(item, newProgress)}
         />
-      </View>
+      </Reanimated.View>
     );
   }
 );
