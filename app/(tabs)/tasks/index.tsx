@@ -502,6 +502,7 @@ const TasksView: React.FC = () => {
         renderItem={renderItem}
         renderSectionHeader={renderSectionHeader}
         ListEmptyComponent={<EmptyState isSearching={searchTerm.length > 0} />}
+        stickySectionHeadersEnabled={false}
         refreshControl={
           <RefreshControl
             refreshing={isRefreshing}
