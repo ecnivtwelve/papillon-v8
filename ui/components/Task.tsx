@@ -184,7 +184,17 @@ const TaskComponent: React.FC<TaskProps> = ({
           )}
 
           {progress !== undefined && !skeleton && (
-            <View style={styles.footerWrapper}>
+            <View style={[styles.footerWrapper, { flexDirection: 'row', gap: 8 }]}>
+              <AnimatedPressable
+                onPress={() => { /* TODO */ }}
+                style={[styles.statusButton, { paddingHorizontal: 12, flexDirection: 'row', alignItems: 'center', gap: 10, marginRight: 'auto', borderColor: colors.border }]}
+                layout={Animation(LinearTransition, "list")}
+              >
+                <Papicons name="clock" size={18} color={colors.text} />
+                <Typography variant="body2" color="text">Rappel</Typography>
+                <Papicons name="ChevronDown" size={14} color={colors.text} />
+
+              </AnimatedPressable>
               <AnimatedPressable
                 onPressIn={() => setIsPressed(true)}
                 onPressOut={() => setIsPressed(false)}
