@@ -1,35 +1,41 @@
-import { Papicons } from '@getpapillon/papicons';
-import { LegendList } from '@legendapp/list';
-import { MenuView } from '@react-native-menu/menu';
-import { useTheme } from '@react-navigation/native';
-import { useNavigation } from 'expo-router';
-import { t } from 'i18next';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Platform, RefreshControl, View } from 'react-native';
-import { useBottomTabBarHeight } from 'react-native-bottom-tabs';
-import Reanimated, { createAnimatedComponent, LinearTransition, useAnimatedScrollHandler, useSharedValue } from 'react-native-reanimated';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Platform, ScrollView, View, FlatList, RefreshControl, Dimensions } from 'react-native';
 
-import { getManager, subscribeManagerUpdate } from '@/services/shared';
-import { Period, Subject } from "@/services/shared/grade";
+import Reanimated, { createAnimatedComponent, LayoutAnimationConfig, LinearTransition, useAnimatedScrollHandler, useSharedValue } from 'react-native-reanimated';
 import ChipButton from '@/ui/components/ChipButton';
-import { CompactGrade } from '@/ui/components/CompactGrade';
-import { Dynamic } from '@/ui/components/Dynamic';
-import Icon from '@/ui/components/Icon';
+
 import Search from '@/ui/components/Search';
-import Stack from '@/ui/components/Stack';
 import TabHeader from '@/ui/components/TabHeader';
 import TabHeaderTitle from '@/ui/components/TabHeaderTitle';
 import Typography from '@/ui/components/Typography';
-import { PapillonAppearIn, PapillonAppearOut } from '@/ui/utils/Transition';
-import { getCurrentPeriod } from '@/utils/grades/helper/period';
-import i18n from '@/utils/i18n';
-import { getPeriodName, getPeriodNumber, isPeriodWithNumber } from "@/utils/services/periods";
+import { useTheme } from '@react-navigation/native';
+
+import { getManager, subscribeManagerUpdate } from '@/services/shared';
+import { Grade as SharedGrade, Period, Subject as SharedSubject, Subject } from "@/services/shared/grade";
+import PapillonMedian from "@/utils/grades/algorithms/median";
+import PapillonSubjectAvg from "@/utils/grades/algorithms/subject";
+import PapillonWeightedAvg from "@/utils/grades/algorithms/weighted";
+
 import { getSubjectColor } from "@/utils/subjects/colors";
 import { getSubjectEmoji } from "@/utils/subjects/emoji";
 import { getSubjectName } from "@/utils/subjects/name";
-
+import { MenuView } from '@react-native-menu/menu';
+import i18n from '@/utils/i18n';
+import Stack from '@/ui/components/Stack';
 import { SubjectItem } from './atoms/Subject';
+import { t } from 'i18next';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useBottomTabBarHeight } from 'react-native-bottom-tabs';
+import Icon from '@/ui/components/Icon';
+import { Papicons } from '@getpapillon/papicons';
+import { Dynamic } from '@/ui/components/Dynamic';
+import { PapillonAppearIn, PapillonAppearOut } from '@/ui/utils/Transition';
+import { CompactGrade } from '@/ui/components/CompactGrade';
+import { getCurrentPeriod } from '@/utils/grades/helper/period';
+import { getPeriodName, getPeriodNumber, isPeriodWithNumber } from "@/utils/services/periods";
+import { LegendList } from '@legendapp/list';
+import { useNavigation } from 'expo-router';
+import ActivityIndicator from '@/ui/components/ActivityIndicator';
 
 const MemoizedSubjectItem = React.memo(SubjectItem);
 
@@ -98,7 +104,7 @@ const GradesView: React.FC = () => {
   const [currentPeriod, setCurrentPeriod] = useState<Period>();
 
   const fetchPeriods = async (managerToUse = manager) => {
-    if (currentPeriod || !managerToUse) { return; }
+    if (currentPeriod || !managerToUse) return;
     setPeriodsLoading(true);
 
     const result = await managerToUse.getGradesPeriods();
@@ -182,9 +188,9 @@ const GradesView: React.FC = () => {
           const aLatestGrade = a.grades[0];
           const bLatestGrade = b.grades[0];
 
-          if (!aLatestGrade && !bLatestGrade) { return 0; }
-          if (!aLatestGrade) { return 1; }
-          if (!bLatestGrade) { return -1; }
+          if (!aLatestGrade && !bLatestGrade) return 0;
+          if (!aLatestGrade) return 1;
+          if (!bLatestGrade) return -1;
 
           return bLatestGrade.givenAt.getTime() - aLatestGrade.givenAt.getTime();
         });
@@ -280,9 +286,10 @@ const GradesView: React.FC = () => {
           >
             <TabHeaderTitle
               color='#2B7ED6'
-              leading={getPeriodName(currentPeriod?.name || '')}
+              leading={periods.length > 0 ? getPeriodName(currentPeriod?.name || '') : t("Tab_Grades")}
               number={isPeriodWithNumber(currentPeriod?.name || '') ? getPeriodNumber(currentPeriod?.name || '') : undefined}
               loading={loading}
+              chevron={periods.length > 1}
             />
           </MenuView>
         }
