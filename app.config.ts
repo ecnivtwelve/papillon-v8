@@ -121,25 +121,29 @@ export default {
               "id": "calendar",
               "displayName": "Emploi du temps",
               "description": "Affiche les cours à venir",
-              "supportedFamilies": ["systemSmall", "systemMedium", "systemLarge"]
+              "supportedFamilies": ["systemSmall", "systemMedium", "systemLarge"],
+              "initialStatePath": "./widgets/components/FallbackStateWidget.tsx"
             },
             {
               "id": "tasks",
               "displayName": "Tâches",
               "description": "Affiche les tâches à faire",
-              "supportedFamilies": ["systemSmall", "systemMedium", "systemLarge"]
+              "supportedFamilies": ["systemSmall", "systemMedium", "systemLarge"],
+              "initialStatePath": "./widgets/components/FallbackStateWidget.tsx"
             },
             {
               "id": "grades",
               "displayName": "Notes",
               "description": "Affiche tes notes récentes",
-              "supportedFamilies": ["systemSmall", "systemMedium", "systemLarge"]
+              "supportedFamilies": ["systemSmall", "systemMedium", "systemLarge"],
+              "initialStatePath": "./widgets/components/FallbackStateWidget.tsx"
             },
             {
               "id": "average",
               "displayName": "Moyenne générale",
               "description": "Affiche ta moyenne générale",
-              "supportedFamilies": ["systemSmall", "systemMedium", "systemLarge"]
+              "supportedFamilies": ["systemSmall", "systemMedium", "systemLarge"],
+              "initialStatePath": "./widgets/components/FallbackStateWidget.tsx"
             }
           ]
         }
