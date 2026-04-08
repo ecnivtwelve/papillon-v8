@@ -183,6 +183,14 @@ export default function SettingsIndex() {
                   color: "#FF6B35",
                   onPress: () => router.navigate("/devmode"),
                 },
+                {
+                  title: "Widgets (développement)",
+                  description: "Aperçu des widgets en développement.",
+                  papicon: <Papicons name={"QrCode"} />,
+                  icon: <InfoIcon />,
+                  color: "#FF6B35",
+                  onPress: () => router.navigate("./dev_widgets"),
+                },
               ]
               : []),
           ],

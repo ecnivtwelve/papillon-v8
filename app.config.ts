@@ -112,6 +112,39 @@ export default {
       "expo-asset",
       "@react-native-community/datetimepicker",
       [
+        "voltra",
+        {
+          "groupIdentifier": "group.xyz.getpapillon.ios",
+          "enablePushNotifications": true,
+          "widgets": [
+            {
+              "id": "calendar",
+              "displayName": "Emploi du temps",
+              "description": "Affiche les cours à venir",
+              "supportedFamilies": ["systemSmall", "systemMedium", "systemLarge"]
+            },
+            {
+              "id": "tasks",
+              "displayName": "Tâches",
+              "description": "Affiche les tâches à faire",
+              "supportedFamilies": ["systemSmall", "systemMedium", "systemLarge"]
+            },
+            {
+              "id": "grades",
+              "displayName": "Notes",
+              "description": "Affiche tes notes récentes",
+              "supportedFamilies": ["systemSmall", "systemMedium", "systemLarge"]
+            },
+            {
+              "id": "average",
+              "displayName": "Moyenne générale",
+              "description": "Affiche ta moyenne générale",
+              "supportedFamilies": ["systemSmall", "systemMedium", "systemLarge"]
+            }
+          ]
+        }
+      ],
+      [
         "expo-image-picker",
         {
           photosPermission:
@@ -157,6 +190,7 @@ export default {
               { name: "SDWebImage", modular_headers: true },
               { name: "SDWebImageSVGCoder", modular_headers: true },
             ],
+            deploymentTarget: "17.6",
           },
         },
       ],

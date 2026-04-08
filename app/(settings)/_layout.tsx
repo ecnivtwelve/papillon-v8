@@ -138,6 +138,13 @@ export default function Layout() {
             headerTitle: t("Settings_Transport_Title"),
           }}
         />
+
+        <Stack.Screen
+          name="dev_widgets"
+          options={{
+            headerTitle: "DevWidgets",
+          }}
+        />
       </Stack>
     </>
   );

@@ -77,6 +77,12 @@
       <dict>
         <key>CFBundleURLSchemes</key>
         <array>
+          <string>xyz.getpapillon.ios</string>
+        </array>
+      </dict>
+      <dict>
+        <key>CFBundleURLSchemes</key>
+        <array>
           <string>exp+papillon</string>
         </array>
       </dict>
@@ -121,6 +127,10 @@
     <string>Allow $(PRODUCT_NAME) to access your microphone</string>
     <key>NSPhotoLibraryUsageDescription</key>
     <string>Papillon utilise ta galerie pour te permettre de personnaliser ta photo de profil</string>
+    <key>NSSupportsLiveActivities</key>
+    <true/>
+    <key>NSSupportsLiveActivitiesFrequentUpdates</key>
+    <false/>
     <key>NSUserActivityTypes</key>
     <array>
       <string>$(PRODUCT_BUNDLE_IDENTIFIER).expo.index_route</string>
@@ -157,5 +167,16 @@
     <string>Automatic</string>
     <key>UIViewControllerBasedStatusBarAppearance</key>
     <false/>
+    <key>Voltra_AppGroupIdentifier</key>
+    <string>group.xyz.getpapillon.ios</string>
+    <key>Voltra_EnablePushNotifications</key>
+    <true/>
+    <key>Voltra_WidgetIds</key>
+    <array>
+      <string>calendar</string>
+      <string>tasks</string>
+      <string>grades</string>
+      <string>average</string>
+    </array>
   </dict>
 </plist>
