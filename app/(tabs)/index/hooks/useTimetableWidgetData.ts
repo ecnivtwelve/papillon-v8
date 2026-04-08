@@ -17,8 +17,6 @@ export const useTimetableWidgetData = () => {
     [account?.services]
   );
 
-  const [courses, setCourses] = useState<SharedCourse[]>([]);
-
   const timetableData = useTimetable(undefined, weekNumber);
   const weeklyTimetable = useMemo(() =>
     timetableData.map(day => ({
@@ -30,27 +28,29 @@ export const useTimetableWidgetData = () => {
     [timetableData, services]
   );
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
 
-      let dayCourse = weeklyTimetable.find(day => day.date.getTime() === today.getTime())?.courses ?? [];
+  const courses = useMemo(() => {
+    let courses: SharedCourse[] = [];
 
-      if (dayCourse.length === 0) {
-        const futureDays = weeklyTimetable
-          .filter(day => day.date.getTime() > today.getTime())
-          .sort((a, b) => a.date.getTime() - b.date.getTime());
+    const futureDays = weeklyTimetable
+      .filter(day => day.date.getTime() > today.getTime())
+      .sort((a, b) => a.date.getTime() - b.date.getTime());
 
-        if (futureDays.length > 0) {
-          dayCourse = futureDays[0].courses;
-        }
-      }
+    console.log("Future days with courses:", futureDays);
 
-      dayCourse = dayCourse.filter(course => course.to.getTime() > Date.now());
-      setCourses(dayCourse);
-    };
-    fetchData();
+    if (futureDays.length > 0) {
+      courses = futureDays[0].courses;
+    }
+
+    const futureCourses = courses.filter(course => course.to.getTime() > Date.now());
+
+    if(futureCourses.length === 0) {
+      return futureDays.length > 1 ? futureDays[1].courses : [];
+    }
+
+    return futureCourses;
   }, [weeklyTimetable]);
 
   return { courses };

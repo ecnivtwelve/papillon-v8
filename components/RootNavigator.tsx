@@ -17,6 +17,7 @@ import getCorners from '@/ui/utils/Corners';
 import { runsIOS26 } from '@/ui/utils/IsLiquidGlass';
 import { screenOptions } from '@/utils/theme/ScreenOptions';
 import AndroidHeaderBackground from './AndroidHeaderBackground';
+import PapillonWidgets from '@/widgets/PapillonWidgets';
 
 export function RootNavigator() {
   const theme = useTheme();
@@ -34,6 +35,7 @@ export function RootNavigator() {
   return (
     <View style={{ flex: 1, backgroundColor: Platform.OS === "android" ? theme.colors.background : undefined }}>
       {Platform.OS === "android" && <StatusBar barStyle={theme.dark ? "light-content" : "dark-content"} animated />}
+      <PapillonWidgets />
       <Stack initialRouteName='(tabs)' screenOptions={stackScreenOptions}>
 
         <Stack.Screen name="(tabs)" options={{ headerShown: false, gestureEnabled: false }} />

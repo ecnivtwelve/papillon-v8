@@ -1,9 +1,12 @@
 import { Papicons } from "@getpapillon/papicons";
 import { useTheme } from "@react-navigation/native";
+import { Directory, Paths } from "expo-file-system";
 import { router } from "expo-router";
+import * as Notifications from "expo-notifications";
 import { Plus } from "lucide-react-native";
 import React, { useEffect, useState } from "react";
 import { Alert, ScrollView, StyleSheet, Switch } from "react-native";
+import { MMKV } from "react-native-mmkv";
 
 import DevModeNotice from "@/components/DevModeNotice";
 import LogIcon from "@/components/Log/LogIcon";
@@ -41,6 +44,64 @@ export default function Devmode() {
   const [showLogsStore, setShowLogsStore] = useState(false);
 
   const [visibleLogsCount, setVisibleLogsCount] = useState(20);
+
+  const resetAppToFactoryState = async () => {
+    await Notifications.cancelAllScheduledNotificationsAsync();
+    await Notifications.setBadgeCountAsync(0);
+
+    magicStore.clear();
+    useLogStore.setState(useLogStore.getInitialState(), true);
+    useAccountStore.setState(useAccountStore.getInitialState(), true);
+    useSettingsStore.setState(useSettingsStore.getInitialState(), true);
+
+    if (useAccountStore.persist) {
+      await useAccountStore.persist.clearStorage();
+    }
+    if (useSettingsStore.persist) {
+      await useSettingsStore.persist.clearStorage();
+    }
+
+    const accountMMKV = new MMKV({
+      id: "account-storage",
+      encryptionKey: "3f64fc8d-472d-43d5-ba11-461020e2423b",
+    });
+    const settingsMMKV = new MMKV({ id: "settings" });
+    const defaultMMKV = new MMKV();
+
+    accountMMKV.clearAll();
+    settingsMMKV.clearAll();
+    defaultMMKV.clearAll();
+
+    const modelDirectory = new Directory(Paths.document, "papillon-models");
+    const wallpaperDirectory = new Directory(Paths.document, "wallpapers");
+    const cacheDirectory = new Directory(Paths.cache);
+
+    if (modelDirectory.exists) {
+      try {
+        modelDirectory.delete();
+      } catch (error) {
+        log(`Échec suppression papillon-models: ${String(error)}`);
+      }
+    }
+    if (wallpaperDirectory.exists) {
+      try {
+        wallpaperDirectory.delete();
+      } catch (error) {
+        log(`Échec suppression wallpapers: ${String(error)}`);
+      }
+    }
+    if (cacheDirectory.exists) {
+      try {
+        cacheDirectory.delete();
+      } catch (error) {
+        log(`Échec suppression cache: ${String(error)}`);
+      }
+    }
+
+    await database.write(async () => {
+      await database.unsafeResetDatabase();
+    });
+  };
 
   const loadMoreLogs = () => {
     setVisibleLogsCount((prev) => prev + 20);
@@ -375,6 +436,43 @@ export default function Devmode() {
       />
 
       <List>
+        <Item
+          onPress={() => {
+            Alert.alert(
+              "Reset complet",
+              "Cette action supprime toutes les données locales et tous les caches (comptes, paramètres, base locale, modèle Magic, fichiers). Continuer ?",
+              [
+                {
+                  text: "Annuler",
+                  style: "cancel",
+                },
+                {
+                  text: "Reset",
+                  style: "destructive",
+                  onPress: async () => {
+                    try {
+                      await resetAppToFactoryState();
+                      Alert.alert(
+                        "Reset terminé",
+                        "Toutes les données locales ont été supprimées."
+                      );
+                      router.replace("/(onboarding)/welcome");
+                    } catch (error) {
+                      Alert.alert(
+                        "Erreur",
+                        `Échec du reset complet: ${String(error)}`
+                      );
+                    }
+                  },
+                },
+              ]
+            );
+          }}
+        >
+          <Typography variant="title">
+            Réinitialiser complètement l&apos;app (usine)
+          </Typography>
+        </Item>
         <Item
           onPress={async () => {
             await database.write(async () => {
